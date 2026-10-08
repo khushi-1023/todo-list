@@ -11,5 +11,22 @@ todoForm.addEventListener("submit", function(event) {
     const li = document.createElement("li");
     li.textContent = todoInput.value;
 
-    todoList.appendChild(li);
+     li.addEventListener("click", function() {
+    li.classList.toggle("completed");
 });
+   
+
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "Delete";
+
+    li.appendChild(deleteButton);
+
+   deleteButton.addEventListener("click", function(event) {
+    event.stopPropagation();
+    li.remove();
+});
+
+    todoList.appendChild(li);
+    todoInput.value = "";
+});
+   
