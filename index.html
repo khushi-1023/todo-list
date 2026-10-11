@@ -1,25 +1,45 @@
+
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8"> 
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-        <title>To-Do List</title>
-        <link rel="stylesheet" href="style.css">
-    </head>
-    <body>
-          <div class="todo-container">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do CRUD App</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <main class="container">
+        <h1>My To-Do List</h1>
 
-        <h1>To-Do List</h1>
         <form id="todo-form">
-            <input type="text" id="todo-input" placeholder="Enter a task">
-            <button type="submit">Add</button>
+            <input
+                type="text"
+                id="todo-title"
+                placeholder="Enter task title"
+                required
+            >
+
+            <textarea
+                id="todo-description"
+                placeholder="Enter task description"
+            ></textarea>
+        
+        
+              <button type="submit" id="submit-btn">
+                   Add Task
+              </button>
+
+             <button type="button" id="cancel-btn" hidden>
+                    Cancel Edit
+             </button>
+
+
         </form>
 
-        <ul id="todo-list"></ul>
-
-    </div>
-
-    <script src="script.js"></script>
-
-    </body>
+        <section id="todo-list">
+            <!-- Tasks will appear here -->
+        </section>
+    </main>
+</body>
 </html>

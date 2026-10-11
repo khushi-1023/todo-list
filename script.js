@@ -1,84 +1,106 @@
+
 const todoForm = document.querySelector("#todo-form");
-const todoInput = document.querySelector("#todo-input");
+const todoTitle = document.querySelector("#todo-title");
+const todoDescription = document.querySelector("#todo-description");
 const todoList = document.querySelector("#todo-list");
+const submitButton = document.querySelector("#submit-btn");
+const cancelButton = document.querySelector("#cancel-btn");
 
-let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+let todos = JSON.parse(localStorage.getItem("todos")) || [];
+let editingTodoId = null;
 
-function saveTasks() {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+function saveTodos() {
+    localStorage.setItem("todos", JSON.stringify(todos));
 }
 
-function renderTasks() {
+function resetForm() {
+    editingTodoId = null;
+    todoForm.reset();
+    submitButton.textContent = "Add Task";
+    cancelButton.hidden = true;
+}
+
+function renderTodos() {
     todoList.innerHTML = "";
 
-    tasks.forEach(function(task, index) {
-        const li = document.createElement("li");
+    if (todos.length === 0) {
+        todoList.innerHTML = '<p class="empty-state">No tasks yet. Add your first task!</p>';
+        return;
+    }
 
-        const taskText = document.createElement("span");
-        taskText.textContent = task.text;
+    todos.forEach(function(todo) {
+        const item = document.createElement("div");
+        item.className = "todo-item";
 
-        if (task.completed) {
-            taskText.classList.add("completed");
-        }
+        const title = document.createElement("h3");
+        title.textContent = todo.title;
 
-        taskText.addEventListener("click", function() {
-            task.completed = !task.completed;
-            saveTasks();
-            renderTasks();
-        });
+        const description = document.createElement("p");
+        description.textContent = todo.description || "No description provided.";
+
+        const actions = document.createElement("div");
+        actions.className = "todo-actions";
 
         const editButton = document.createElement("button");
         editButton.textContent = "Edit";
-
-        editButton.addEventListener("click", function(event) {
-            event.stopPropagation();
-
-            const newTask = prompt("Edit your task:", task.text);
-
-            if (newTask !== null && newTask.trim() !== "") {
-                task.text = newTask.trim();
-                saveTasks();
-                renderTasks();
-            }
+        editButton.className = "edit-btn";
+        editButton.addEventListener("click", function() {
+            todoTitle.value = todo.title;
+            todoDescription.value = todo.description;
+            editingTodoId = todo.id;
+            submitButton.textContent = "Update Task";
+            cancelButton.hidden = false;
+            todoTitle.focus();
         });
 
         const deleteButton = document.createElement("button");
         deleteButton.textContent = "Delete";
-
-        deleteButton.addEventListener("click", function(event) {
-            event.stopPropagation();
-
-            tasks.splice(index, 1);
-            saveTasks();
-            renderTasks();
+        deleteButton.className = "delete-btn";
+        deleteButton.addEventListener("click", function() {
+            todos = todos.filter(item => item.id !== todo.id);
+            if (editingTodoId === todo.id) resetForm();
+            saveTodos();
+            renderTodos();
         });
 
-        li.appendChild(taskText);
-        li.appendChild(editButton);
-        li.appendChild(deleteButton);
-
-        todoList.appendChild(li);
+        actions.append(editButton, deleteButton);
+        item.append(title, description, actions);
+        todoList.appendChild(item);
     });
 }
 
 todoForm.addEventListener("submit", function(event) {
     event.preventDefault();
 
-    const text = todoInput.value.trim();
+    const title = todoTitle.value.trim();
+    const description = todoDescription.value.trim();
 
-    if (text === "") {
+    if (!title) {
+        alert("Please enter a task title.");
         return;
     }
 
-    tasks.push({
-        text: text,
-        completed: false
-    });
+    if (editingTodoId !== null) {
+        todos = todos.map(todo => todo.id === editingTodoId
+            ? { ...todo, title, description, updatedAt: Date.now() }
+            : todo
+        );
+    } else {
+        const now = Date.now();
+        todos.push({
+            id: todos.length ? Math.max(...todos.map(todo => todo.id)) + 1 : 1,
+            title,
+            description,
+            createdAt: now,
+            updatedAt: now
+        });
+    }
 
-    saveTasks();
-    renderTasks();
-
-    todoInput.value = "";
+    resetForm();
+    saveTodos();
+    renderTodos();
 });
 
-renderTasks();
+cancelButton.addEventListener("click", resetForm);
+
+renderTodos();
