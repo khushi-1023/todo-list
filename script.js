@@ -81,7 +81,7 @@ todoForm.addEventListener("submit", function(event) {
     }
 
     if (editingTodoId !== null) {
-        todos = todos.map(todo => todo.id === editingTodoId
+        todos ``= todos.map(todo => todo.id === editingTodoId
             ? { ...todo, title, description, updatedAt: Date.now() }
             : todo
         );
